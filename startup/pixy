@@ -1,0 +1,47 @@
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:          pixy
+# Required-Start:    $local_fs $remote_fs
+# Required-Stop:
+# X-Start-Before:    rmnologin
+# Default-Start:     2 3 4 5
+# Default-Stop:
+# Short-Description: Provide limited super user privileges to specific users
+# Description: Provide limited super user privileges to specific users.
+### END INIT INFO
+#
+# Setup steps:
+#	1. in /etc/init.d run:  ln -s /home/pi/GitHub/pixy17/startup/pixy
+#	2. sudo insserv pixy
+#	3. sudo systemctl enable pixy
+#	4. sudo systemctl start pixy
+#
+# To Start/Stop the app
+#	sudo systemctl start pixy
+#
+#	sudo systemctl stop pixy
+##########################################################
+#
+
+. /lib/lsb/init-functions
+
+set -e
+
+case "$1" in
+  start)
+        python /home/pi/GitHub/pixy17/vision-peg.py 10.10.73.2 &
+	sleep 3
+        python /home/pi/GitHub/pixy17/vision-boiler.py 10.10.73.2 &
+	;;
+  stop|reload|restart|force-reload|status)
+	kill `ps -def | grep vision-peg | grep python | awk '{print $2}'`
+	kill `ps -def | grep vision-boiler | grep python | awk '{print $2}'`
+	;;
+  *)
+	echo "Usage: $N {start|stop|restart|force-reload|status}" >&2
+	exit 1
+	;;
+esac
+
+exit 0
